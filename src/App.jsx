@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import { ChakraProvider } from "@chakra-ui/react";
 
+import AppNavigator from "./navigation/AppNavigator";
 import { socket } from "./utils/socketClient";
+import appReducer from "./store/reducers/appReducer";
 
 function App() {
-  const [currLocation, setCurrLocation] = useState({ lat: 0, long: 0 });
+  const store = configureStore({
+    reducer: appReducer,
+  });
 
   useEffect(() => {
     socket.connect();
-    navigator.geolocation.getCurrentPosition(sendLocation, (error) => {
-      console.log(error);
-    });
+
+    // socket.on("create-room-success", () => {
+    //   setSelectedPeople();
+    // });
 
     return () => {
       socket.emit("leave-session");
@@ -18,35 +26,12 @@ function App() {
     };
   }, []);
 
-  const sendLocation = (position) => {
-    const location = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    };
-    setCurrLocation({ lat: location.latitude, long: location.longitude });
-    socket.emit("enter-name", {
-      name: "Laksh Makhija",
-      location: location,
-    });
-  };
-
-  const getNearbyUsers = () => {
-    // socket.emit("enter-name", {
-    //   name: "Example",
-    //   location: { latitude: 23, longitude: -90 },
-    // });
-    socket.emit("find-nearby-users");
-  };
-
   return (
-    <>
-      <div>
-        <p>
-          Hello! Your IP Address is: {currLocation.lat}, {currLocation.long}
-        </p>
-        <button onClick={getNearbyUsers}>Emit message</button>
-      </div>
-    </>
+    <Provider store={store}>
+      <ChakraProvider>
+        <AppNavigator />
+      </ChakraProvider>
+    </Provider>
   );
 }
 

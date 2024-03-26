@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "File Drop",
+  "version": "0.1.0",
+
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["scripting", "geolocation", "tabs"],
+  "host_permissions": ["http://*/*", "https://*/*"]
+}
